@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   node1:
     image: atlassian/jira-software
@@ -12,7 +10,7 @@ services:
       CATALINA_OPTS: -Datlassian.cluster.scale=true -DjvmRoute=node1 -Datlassian.dev.mode=true
       DB_HOST: infrastructure-postgres
       DB_PORT: 5432
-      DB_USER: emigm
+      DB_USER: ${USER}
       DB_PASSWORD:
     ulimits:
       nproc: 65535
@@ -21,3 +19,6 @@ services:
         hard: 65535
     networks:
       - bugcrowd_infra
+networks:
+  bugcrowd_infra:
+    external: true
