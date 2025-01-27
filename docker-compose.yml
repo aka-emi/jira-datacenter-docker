@@ -2,52 +2,22 @@ version: '3.7'
 
 services:
   node1:
-    image: atlassian/jira-software:8.13.4
+    image: atlassian/jira-software
     ports:
      - 9090:8080
     volumes:
       - ./jira-home-node1:/var/atlassian/application-data/jira:Z
       - ./jira-shared-home:/var/atlassian/jira-shared-home:z
     environment:
-      CATALINA_OPTS: -Datlassian.cluster.scale=true -DjvmRoute=node1
+      CATALINA_OPTS: -Datlassian.cluster.scale=true -DjvmRoute=node1 -Datlassian.dev.mode=true
+      DB_HOST: infrastructure-postgres
+      DB_PORT: 5432
+      DB_USER: emigm
+      DB_PASSWORD:
     ulimits:
       nproc: 65535
       nofile:
         soft: 65535
         hard: 65535
-  node2:
-    image: atlassian/jira-software:8.13.4
-    ports:
-     - 9091:8080
-    volumes:
-      - ./jira-home-node2:/var/atlassian/application-data/jira:Z
-      - ./jira-shared-home:/var/atlassian/jira-shared-home:z
-    environment:
-      CATALINA_OPTS: -Datlassian.cluster.scale=true -DjvmRoute=node2
-    ulimits:
-      nproc: 65535
-      nofile:
-        soft: 65535
-        hard: 65535
-
-  # TODO replace with haproxy
-  # docker run -d --name my-running-haproxy -v /path/to/etc/haproxy:/usr/local/etc/haproxy:ro --sysctl net.ipv4.ip_unprivileged_port_start=0 haproxy:2.3
-  proxy:
-    image: haproxy:2.3
-    ports:
-    - 80:80
-    - 443:443
-    volumes: 
-      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-
-  database:
-    image: postgres:10.5-alpine
-    volumes:
-      - ./postgresql-data:/var/lib/postgresql/data:Z
-      - ./postgre-db-init.sql:/docker-entrypoint-initdb.d/postgre-db-init.sql:Z
-    ports:
-     - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: 1234
-
-
+    networks:
+      - bugcrowd_infra
